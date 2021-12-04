@@ -11,28 +11,28 @@ class Board:
         self.called.append([False] * len(values))
 
     def mark(self, value) -> None:
-        for y in range(0, len(self.numbers)):
-            for x in range(0, len(self.numbers[y])):
+        for y in range(len(self.numbers)):
+            for x in range(len(self.numbers[y])):
                 if self.numbers[y][x] == value:
                     self.called[y][x] = True
                     return
 
     def has_bingo(self) -> bool:
         # Check rows
-        for y, row in enumerate(self.called):
+        for row in self.called:
             bingo = True
 
-            for x, field in enumerate(row):
+            for field in row:
                 bingo = bingo & field
 
             if bingo:
                 return True
 
         # Check columns
-        for x in range(0, len(self.called[0])):
+        for x in range(len(self.called[0])):
             bingo = True
 
-            for y in range(0, len(self.called)):
+            for y in range(len(self.called)):
                 bingo = bingo & self.called[y][x]
 
             if bingo:
@@ -57,13 +57,13 @@ callouts = list(map(int, sys.stdin.readline().strip().split(',')))
 # Init boards
 boards = []
 for line in sys.stdin:
-    line = line.strip().replace('  ', ' ')
+    line = line.strip()
 
     if not line:
         boards.append(Board())
         continue
 
-    boards[len(boards) - 1].add_row(list(map(int, line.split(' '))))
+    boards[-1].add_row(list(map(int, line.split())))
 
 # Filter out empty boards due to uncaught blank lines
 boards = list(filter(lambda board: len(board.numbers), boards))
@@ -77,11 +77,11 @@ for callout in callouts:
         board.mark(callout)
 
         if board.has_bingo():
-            boards.remove(board)
-
-            last_win_score = board.sum_of_unmarked_numbers() * int(callout)
+            last_win_score = board.sum_of_unmarked_numbers() * callout
             if first_win_score is None:
                 first_win_score = last_win_score
+
+    boards = list(filter(lambda board: not board.has_bingo(), boards))
 
     if not len(boards):
         break
