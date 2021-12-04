@@ -19,11 +19,11 @@ class Board:
 
     def has_bingo(self) -> bool:
         # Check rows
-        for y in range(0, len(self.called)):
+        for y, row in enumerate(self.called):
             bingo = True
 
-            for x in range(0, len(self.called[y])):
-                bingo = bingo & self.called[y][x]
+            for x, field in enumerate(row):
+                bingo = bingo & field
 
             if bingo:
                 return True
@@ -43,10 +43,10 @@ class Board:
     def sum_of_unmarked_numbers(self) -> int:
         unmarked_sum = 0
 
-        for y in range(0, len(self.numbers)):
-            for x in range(0, len(self.numbers[y])):
+        for y, row in enumerate(self.numbers):
+            for x, field in enumerate(row):
                 if not self.called[y][x]:
-                    unmarked_sum += self.numbers[y][x]
+                    unmarked_sum += field
 
         return unmarked_sum
 
