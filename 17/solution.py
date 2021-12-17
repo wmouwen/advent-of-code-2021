@@ -2,35 +2,30 @@ import re
 import sys
 
 
-def find_vy(y_min, y_max, initial_vx, x_min, x_max) -> int:
-    for candidate_vy in range(max(x_max, abs(y_max))):
-        vx = initial_vx
-        vy = candidate_vy
-        (x, y) = (0, 0)
+def reaches_target(x_min, x_max, y_min, y_max, vx, vy) -> bool:
+    (x, y) = (0, 0)
 
-        while y_min <= y and x <= x_max:
-            # Broken
-            x += vx
-            vx -= 1
+    while x <= x_max and y_min <= y:
+        if x_min <= x <= x_max and y_min <= y <= y_max:
+            return True
 
-            y += vy
-            vy -= 1
+        (x, y) = (x + vx, y + vy)
+        (vx, vy) = (max(0, vx - 1), vy - 1)
 
-            if y_min <= y <= y_max:
-                return candidate_vy
+    return False
 
 
-input = re.match(r'^target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)$', sys.stdin.read()).groups()
+input = re.match(r'^target area: x=(\d+)..(\d+), y=(-\d+)..(-\d+)$', sys.stdin.read()).groups()
 (x_min, x_max, y_min, y_max) = (int(group) for group in input)
 
-print(x_min, x_max, y_min, y_max)
+possible_velocities = 0
+max_height = 0
 
-vx = 0
-x = 0
-while not (x_min <= x <= x_max):
-    vx += 1
-    x += vx
+for vx in range(x_max + 1):
+    for vy in range(y_min, -1 * y_min):
+        if reaches_target(x_min, x_max, y_min, y_max, vx, vy):
+            possible_velocities += 1
+            max_height = max(max_height, (vy * (vy + 1)) // 2 if vy >= 0 else 0)
 
-vy = find_vy(y_min, y_max, vx, x_min, x_max)
-print(vx, vy)
-print((vy * (vy + 1)) // 2)
+print(max_height)
+print(possible_velocities)
